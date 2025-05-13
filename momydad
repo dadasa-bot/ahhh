@@ -1,0 +1,78 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Rayfield Example Window",
+   Icon = 0,
+   LoadingTitle = "Rayfield Interface Suite",
+   LoadingSubtitle = "by Sirius",
+   Theme = "Default",
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil,
+      FileName = "Big Hub"
+   },
+
+   Discord = {
+      Enabled = false,
+      Invite = "MzhfAsME",
+      RememberJoins = true
+   },
+
+   KeySystem = true,
+   KeySettings = {
+      Title = "Untitled",
+      Subtitle = "Key System",
+      Note = "Key is Hello",
+      FileName = "Key",
+      SaveKey = true,
+      GrabKeyFromSite = false,
+      Key = {"Hello"}
+   }
+})
+
+local Player = game:GetService("Players").LocalPlayer
+local Humanoid = function()
+    return Player.Character and Player.Character:FindFirstChildOfClass("Humanoid")
+end
+
+local MainTab = Window:CreateTab("Player", 4483362458) -- You can change the tab name and icon here
+
+-- WalkSpeed Slider
+MainTab:CreateSlider({
+   Name = "WalkSpeed",
+   Range = {16, 100},
+   Increment = 1,
+   Suffix = "Speed",
+   CurrentValue = 16,
+   Flag = "WalkSpeedSlider",
+   Callback = function(Value)
+      if Humanoid() then
+         Humanoid().WalkSpeed = Value
+      end
+   end,
+})
+
+-- JumpPower Slider
+MainTab:CreateSlider({
+   Name = "JumpPower",
+   Range = {50, 150},
+   Increment = 1,
+   Suffix = "Power",
+   CurrentValue = 50,
+   Flag = "JumpPowerSlider",
+   Callback = function(Value)
+      if Humanoid() then
+         Humanoid().JumpPower = Value
+      end
+   end,
+})
+
+-- Reapply values on respawn
+Player.CharacterAdded:Connect(function(char)
+    char:WaitForChild("Humanoid").WalkSpeed = Rayfield.Flags.WalkSpeedSlider.CurrentValue
+    char.Humanoid.JumpPower = Rayfield.Flags.JumpPowerSlider.CurrentValue
+end)
