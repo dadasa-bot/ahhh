@@ -3,8 +3,8 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
    Name = "Rayfield Example Window",
    Icon = 0,
-   LoadingTitle = "Rayfield Interface Suite",
-   LoadingSubtitle = "by Sirius",
+   LoadingTitle = "King von",
+   LoadingSubtitle = "by Kingvon",
    Theme = "Default",
 
    DisableRayfieldPrompts = false,
@@ -24,12 +24,12 @@ local Window = Rayfield:CreateWindow({
 
    KeySystem = true,
    KeySettings = {
-      Title = "Untitled",
+      Title = "Enter key",
       Subtitle = "Key System",
       Note = "Key is Hello",
       FileName = "Key",
       SaveKey = true,
-      GrabKeyFromSite = false,
+      GrabKeyFromSite = true,
       Key = {"Hello"}
    }
 })
