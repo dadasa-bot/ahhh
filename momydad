@@ -1,113 +1,153 @@
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
+-- Auto character wait
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
 
---// Spoof Table
-local spoofedValues = {
-	WalkSpeed = humanoid.WalkSpeed,
-	JumpPower = humanoid.JumpPower
-}
+local function setup()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
 
---// Hook Metamethod
-local mt = getrawmetatable(game)
-setreadonly(mt, false)
-local oldIndex = mt.__index
+    -- Hook spoof table
+    local spoofedValues = {
+        WalkSpeed = humanoid.WalkSpeed,
+        JumpPower = humanoid.JumpPower
+    }
 
-mt.__index = newcclosure(function(self, key)
-	if self == humanoid and spoofedValues[key] then
-		return spoofedValues[key]
-	end
-	return oldIndex(self, key)
-end)
-setreadonly(mt, true)
+    -- Hook __index
+    local mt = getrawmetatable(game)
+    setreadonly(mt, false)
+    local oldIndex = mt.__index
 
---// GUI Setup
-local gui = Instance.new("ScreenGui", CoreGui)
-gui.Name = "WSJP_GUI"
+    mt.__index = newcclosure(function(self, key)
+        if self == humanoid and spoofedValues[key] then
+            return spoofedValues[key]
+        end
+        return oldIndex(self, key)
+    end)
+    setreadonly(mt, true)
 
-local openButton = Instance.new("TextButton", gui)
-openButton.Size = UDim2.new(0, 150, 0, 50)
-openButton.Position = UDim2.new(0, 20, 0.5, -100)
-openButton.Text = "Open Speed Menu"
-openButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-openButton.TextColor3 = Color3.new(1, 1, 1)
-openButton.Font = Enum.Font.SourceSansBold
-openButton.TextScaled = true
-openButton.Active = true
-openButton.Draggable = true
+    -- Create GUI
+    local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+    gui.Name = "WSJP_GUI"
+    gui.ResetOnSpawn = false
 
-local ui = Instance.new("UICorner", openButton)
-ui.CornerRadius = UDim.new(0, 10)
+    -- Open Button
+    local openButton = Instance.new("TextButton", gui)
+    openButton.Size = UDim2.new(0, 160, 0, 50)
+    openButton.Position = UDim2.new(0, 20, 0.5, -120)
+    openButton.Text = "Open Speed Menu"
+    openButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    openButton.TextColor3 = Color3.new(1, 1, 1)
+    openButton.Font = Enum.Font.SourceSansBold
+    openButton.TextSize = 20
 
-local mainFrame = Instance.new("Frame", openButton)
-mainFrame.Size = UDim2.new(0, 200, 0, 200)
-mainFrame.Position = UDim2.new(0, 20, 0.5, -30)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-mainFrame.Visible = false
+    -- UICorner & Stroke for button
+    local corner = Instance.new("UICorner", openButton)
+    local stroke = Instance.new("UIStroke", openButton)
+    stroke.Thickness = 2
+    stroke.Color = Color3.fromRGB(255, 255, 255)
 
-local ui = Instance.new("UICorner", mainFrame)
-ui.CornerRadius = UDim.new(0, 10)
+    -- Main Frame
+    local mainFrame = Instance.new("Frame", gui)
+    mainFrame.Size = UDim2.new(0, 250, 0, 230)
+    mainFrame.Position = UDim2.new(0, 20, 0.5, -50)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    mainFrame.Visible = false
+    mainFrame.Active = true
+    mainFrame.Draggable = true
 
-local layout = Instance.new("UIListLayout", mainFrame)
-layout.Padding = UDim.new(0, 10)
-layout.SortOrder = Enum.SortOrder.LayoutOrder
+    local frameCorner = Instance.new("UICorner", mainFrame)
+    local frameStroke = Instance.new("UIStroke", mainFrame)
+    frameStroke.Thickness = 2
+    frameStroke.Color = Color3.fromRGB(255, 255, 255)
 
--- WalkSpeed Input
-local wsBox = Instance.new("TextBox", mainFrame)
-wsBox.Size = UDim2.new(1, -20, 0, 40)
-wsBox.Text = ""
-wsBox.PlaceholderText = "Enter WalkSpeed"
-wsBox.TextColor3 = Color3.new(1, 1, 1)
-wsBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-wsBox.Font = Enum.Font.SourceSans
-wsBox.TextSize = 18
-wsBox.ClearTextOnFocus = false
+    -- Layout
+    local layout = Instance.new("UIListLayout", mainFrame)
+    layout.Padding = UDim.new(0, 10)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
 
-local ui = Instance.new("UICorner", wsBox)
-ui.CornerRadius = UDim.new(0, 10)
+    -- Padding
+    local padding = Instance.new("UIPadding", mainFrame)
+    padding.PaddingTop = UDim.new(0, 10)
+    padding.PaddingLeft = UDim.new(0, 10)
+    padding.PaddingRight = UDim.new(0, 10)
 
--- JumpPower Input
-local jpBox = Instance.new("TextBox", mainFrame)
-jpBox.Size = UDim2.new(1, -20, 0, 40)
-jpBox.Text = ""
-jpBox.PlaceholderText = "Enter JumpPower"
-jpBox.TextColor3 = Color3.new(1, 1, 1)
-jpBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-jpBox.Font = Enum.Font.SourceSans
-jpBox.TextSize = 18
-jpBox.ClearTextOnFocus = false
+    -- TextBoxes
+    local wsBox = Instance.new("TextBox", mainFrame)
+    wsBox.Size = UDim2.new(1, 0, 0, 40)
+    wsBox.PlaceholderText = "Enter WalkSpeed"
+    wsBox.Text = ""
+    wsBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    wsBox.TextColor3 = Color3.new(1, 1, 1)
+    wsBox.Font = Enum.Font.SourceSans
+    wsBox.TextSize = 18
+    Instance.new("UICorner", wsBox)
 
-local ui = Instance.new("UICorner", jpBox)
-ui.CornerRadius = UDim.new(0, 10)
+    local jpBox = Instance.new("TextBox", mainFrame)
+    jpBox.Size = UDim2.new(1, 0, 0, 40)
+    jpBox.PlaceholderText = "Enter JumpPower"
+    jpBox.Text = ""
+    jpBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    jpBox.TextColor3 = Color3.new(1, 1, 1)
+    jpBox.Font = Enum.Font.SourceSans
+    jpBox.TextSize = 18
+    Instance.new("UICorner", jpBox)
 
--- Run Button
-local runButton = Instance.new("TextButton", mainFrame)
-runButton.Size = UDim2.new(1, -20, 0, 40)
-runButton.Text = "Apply"
-runButton.TextColor3 = Color3.new(1, 1, 1)
-runButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-runButton.Font = Enum.Font.SourceSansBold
-runButton.TextSize = 20
+    -- Apply Button
+    local applyBtn = Instance.new("TextButton", mainFrame)
+    applyBtn.Size = UDim2.new(1, 0, 0, 40)
+    applyBtn.Text = "Apply"
+    applyBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+    applyBtn.TextColor3 = Color3.new(1, 1, 1)
+    applyBtn.Font = Enum.Font.SourceSansBold
+    applyBtn.TextSize = 20
+    Instance.new("UICorner", applyBtn)
 
-local ui = Instance.new("UICorner", runButton)
-ui.CornerRadius = UDim.new(0, 10)
+    -- Reset Button
+    local resetBtn = Instance.new("TextButton", mainFrame)
+    resetBtn.Size = UDim2.new(1, 0, 0, 40)
+    resetBtn.Text = "Reset to Default"
+    resetBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+    resetBtn.TextColor3 = Color3.new(1, 1, 1)
+    resetBtn.Font = Enum.Font.SourceSansBold
+    resetBtn.TextSize = 18
+    Instance.new("UICorner", resetBtn)
 
--- Toggle Visibility
-openButton.MouseButton1Click:Connect(function()
-	mainFrame.Visible = not mainFrame.Visible
-end)
+    -- Open toggle
+    openButton.MouseButton1Click:Connect(function()
+        mainFrame.Visible = not mainFrame.Visible
+    end)
 
--- Apply Hooked Values
-runButton.MouseButton1Click:Connect(function()
-	local ws = tonumber(wsBox.Text)
-	local jp = tonumber(jpBox.Text)
+    -- Apply
+    applyBtn.MouseButton1Click:Connect(function()
+        local ws = tonumber(wsBox.Text)
+        local jp = tonumber(jpBox.Text)
 
-	if ws then
-		humanoid.WalkSpeed = ws
-		spoofedValues.WalkSpeed = ws
-	end
-	if jp then
-		humanoid.JumpPower = jp
-		spoofedValues.JumpPower = jp
-	end
+        if ws then
+            humanoid.WalkSpeed = ws
+            spoofedValues.WalkSpeed = ws
+        end
+        if jp then
+            humanoid.JumpPower = jp
+            spoofedValues.JumpPower = jp
+        end
+    end)
+
+    -- Reset
+    resetBtn.MouseButton1Click:Connect(function()
+        humanoid.WalkSpeed = 16
+        humanoid.JumpPower = 50
+        spoofedValues.WalkSpeed = 16
+        spoofedValues.JumpPower = 50
+        wsBox.Text = ""
+        jpBox.Text = ""
+    end)
+end
+
+-- Run setup once
+setup()
+
+-- Auto-apply on respawn
+player.CharacterAdded:Connect(function()
+    task.wait(1) -- Give character time to load
+    setup()
 end)
