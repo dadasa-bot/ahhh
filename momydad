@@ -22,7 +22,7 @@ end)
 setreadonly(mt, true)
 
 --// GUI Setup
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+local gui = Instance.new("ScreenGui", CoreGui)
 gui.Name = "WSJP_GUI"
 
 local openButton = Instance.new("TextButton", gui)
@@ -32,13 +32,21 @@ openButton.Text = "Open Speed Menu"
 openButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 openButton.TextColor3 = Color3.new(1, 1, 1)
 openButton.Font = Enum.Font.SourceSansBold
-openButton.TextSize = 20
+openButton.TextScaled = true
+openButton.Active = true
+openButton.Draggable = true
 
-local mainFrame = Instance.new("Frame", gui)
-mainFrame.Size = UDim2.new(0, 250, 0, 200)
+local ui = Instance.new("UICorner", openButton)
+ui.CornerRadius = UDim.new(0, 10)
+
+local mainFrame = Instance.new("Frame", openButton)
+mainFrame.Size = UDim2.new(0, 200, 0, 200)
 mainFrame.Position = UDim2.new(0, 20, 0.5, -30)
 mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.Visible = false
+
+local ui = Instance.new("UICorner", mainFrame)
+ui.CornerRadius = UDim.new(0, 10)
 
 local layout = Instance.new("UIListLayout", mainFrame)
 layout.Padding = UDim.new(0, 10)
@@ -55,6 +63,9 @@ wsBox.Font = Enum.Font.SourceSans
 wsBox.TextSize = 18
 wsBox.ClearTextOnFocus = false
 
+local ui = Instance.new("UICorner", wsBox)
+ui.CornerRadius = UDim.new(0, 10)
+
 -- JumpPower Input
 local jpBox = Instance.new("TextBox", mainFrame)
 jpBox.Size = UDim2.new(1, -20, 0, 40)
@@ -66,6 +77,9 @@ jpBox.Font = Enum.Font.SourceSans
 jpBox.TextSize = 18
 jpBox.ClearTextOnFocus = false
 
+local ui = Instance.new("UICorner", jpBox)
+ui.CornerRadius = UDim.new(0, 10)
+
 -- Run Button
 local runButton = Instance.new("TextButton", mainFrame)
 runButton.Size = UDim2.new(1, -20, 0, 40)
@@ -74,6 +88,9 @@ runButton.TextColor3 = Color3.new(1, 1, 1)
 runButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
 runButton.Font = Enum.Font.SourceSansBold
 runButton.TextSize = 20
+
+local ui = Instance.new("UICorner", runButton)
+ui.CornerRadius = UDim.new(0, 10)
 
 -- Toggle Visibility
 openButton.MouseButton1Click:Connect(function()
