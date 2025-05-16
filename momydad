@@ -1,78 +1,96 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
 
-local Window = Rayfield:CreateWindow({
-   Name = "Rayfield Example Window",
-   Icon = 0,
-   LoadingTitle = "Rayfield Interface Suite",
-   LoadingSubtitle = "by Sirius",
-   Theme = "Default",
+--// Spoof Table
+local spoofedValues = {
+	WalkSpeed = humanoid.WalkSpeed,
+	JumpPower = humanoid.JumpPower
+}
 
-   DisableRayfieldPrompts = false,
-   DisableBuildWarnings = false,
+--// Hook Metamethod
+local mt = getrawmetatable(game)
+setreadonly(mt, false)
+local oldIndex = mt.__index
 
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = nil,
-      FileName = "Big Hub"
-   },
+mt.__index = newcclosure(function(self, key)
+	if self == humanoid and spoofedValues[key] then
+		return spoofedValues[key]
+	end
+	return oldIndex(self, key)
+end)
+setreadonly(mt, true)
 
-   Discord = {
-      Enabled = false,
-      Invite = "MzhfAsME",
-      RememberJoins = true
-   },
+--// GUI Setup
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "WSJP_GUI"
 
-   KeySystem = true,
-   KeySettings = {
-      Title = "Untitled",
-      Subtitle = "Key System",
-      Note = "Key is Hello",
-      FileName = "Key",
-      SaveKey = true,
-      GrabKeyFromSite = false,
-      Key = {"Hello"}
-   }
-})
+local openButton = Instance.new("TextButton", gui)
+openButton.Size = UDim2.new(0, 150, 0, 50)
+openButton.Position = UDim2.new(0, 20, 0.5, -100)
+openButton.Text = "Open Speed Menu"
+openButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+openButton.TextColor3 = Color3.new(1, 1, 1)
+openButton.Font = Enum.Font.SourceSansBold
+openButton.TextSize = 20
 
-local Player = game:GetService("Players").LocalPlayer
-local Humanoid = function()
-    return Player.Character and Player.Character:FindFirstChildOfClass("Humanoid")
-end
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.Size = UDim2.new(0, 250, 0, 200)
+mainFrame.Position = UDim2.new(0, 20, 0.5, -30)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.Visible = false
 
-local MainTab = Window:CreateTab("Player", 4483362458) -- You can change the tab name and icon here
+local layout = Instance.new("UIListLayout", mainFrame)
+layout.Padding = UDim.new(0, 10)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
 
--- WalkSpeed Slider
-MainTab:CreateSlider({
-   Name = "WalkSpeed",
-   Range = {16, 100},
-   Increment = 1,
-   Suffix = "Speed",
-   CurrentValue = 16,
-   Flag = "WalkSpeedSlider",
-   Callback = function(Value)
-      if Humanoid() then
-         Humanoid().WalkSpeed = Value
-      end
-   end,
-})
+-- WalkSpeed Input
+local wsBox = Instance.new("TextBox", mainFrame)
+wsBox.Size = UDim2.new(1, -20, 0, 40)
+wsBox.Text = ""
+wsBox.PlaceholderText = "Enter WalkSpeed"
+wsBox.TextColor3 = Color3.new(1, 1, 1)
+wsBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+wsBox.Font = Enum.Font.SourceSans
+wsBox.TextSize = 18
+wsBox.ClearTextOnFocus = false
 
--- JumpPower Slider
-MainTab:CreateSlider({
-   Name = "JumpPower",
-   Range = {50, 150},
-   Increment = 1,
-   Suffix = "Power",
-   CurrentValue = 50,
-   Flag = "JumpPowerSlider",
-   Callback = function(Value)
-      if Humanoid() then
-         Humanoid().JumpPower = Value
-      end
-   end,
-})
+-- JumpPower Input
+local jpBox = Instance.new("TextBox", mainFrame)
+jpBox.Size = UDim2.new(1, -20, 0, 40)
+jpBox.Text = ""
+jpBox.PlaceholderText = "Enter JumpPower"
+jpBox.TextColor3 = Color3.new(1, 1, 1)
+jpBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+jpBox.Font = Enum.Font.SourceSans
+jpBox.TextSize = 18
+jpBox.ClearTextOnFocus = false
 
--- Reapply values on respawn
-Player.CharacterAdded:Connect(function(char)
-    char:WaitForChild("Humanoid").WalkSpeed = Rayfield.Flags.WalkSpeedSlider.CurrentValue
-    char.Humanoid.JumpPower = Rayfield.Flags.JumpPowerSlider.CurrentValue
+-- Run Button
+local runButton = Instance.new("TextButton", mainFrame)
+runButton.Size = UDim2.new(1, -20, 0, 40)
+runButton.Text = "Apply"
+runButton.TextColor3 = Color3.new(1, 1, 1)
+runButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+runButton.Font = Enum.Font.SourceSansBold
+runButton.TextSize = 20
+
+-- Toggle Visibility
+openButton.MouseButton1Click:Connect(function()
+	mainFrame.Visible = not mainFrame.Visible
+end)
+
+-- Apply Hooked Values
+runButton.MouseButton1Click:Connect(function()
+	local ws = tonumber(wsBox.Text)
+	local jp = tonumber(jpBox.Text)
+
+	if ws then
+		humanoid.WalkSpeed = ws
+		spoofedValues.WalkSpeed = ws
+	end
+	if jp then
+		humanoid.JumpPower = jp
+		spoofedValues.JumpPower = jp
+	end
 end)
